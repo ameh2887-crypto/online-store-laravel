@@ -1,0 +1,12 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+        - routes
+    # Level 5 adalah titik awal yang baik, Anda bisa menaikkannya ke 6,7,8,9 perlahan
+    level: 5
+    ignoreErrors:
+        - '#Call to an undefined method#'
+    reportUnmatchedIgnoredErrors: false
