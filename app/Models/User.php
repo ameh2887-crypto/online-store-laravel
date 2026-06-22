@@ -7,6 +7,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Order;
 
+/**
+ * @method string getRole()
+ * @method int getBalance()
+ * @method string getName()
+ */
+
 class User extends Authenticatable
 {
     use Notifiable;

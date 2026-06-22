@@ -30,14 +30,11 @@ class AdminProductController extends Controller
         $newProduct->save();
 
         if ($request->hasFile('image')) {
-            $imageName = $newProduct->getId() . "." . $request->file('image')->extension();
-            Storage::disk('public')->put(
-                $imageName,
-                file_get_contents($request->file('image')->getRealPath())
-            );
-            $newProduct->setImage($imageName);
-            $newProduct->save();
-        }
+    $imageName = $newProduct->getId().".".$request->file('image')->extension();
+    $request->file('image')->move(public_path('img'), $imageName);
+    $newProduct->setImage($imageName);
+    $newProduct->save();
+}
 
         return back();
     }
