@@ -28,7 +28,7 @@
     <div class="col content-grey">
       <nav class="p-3 shadow text-end">
         <span class="profile-font">Admin</span>
-        <img class="img-profile rounded-circle" src="https://ui-avatars.com/api/?name=Admin&background=1abc9c&color=fff&size=40">
+        <img class="img-profile rounded-circle" src="{{ asset('/img/undraw_profile.png') }}">
       </nav>
       <div class="g-0 m-5">
         @yield('content')
