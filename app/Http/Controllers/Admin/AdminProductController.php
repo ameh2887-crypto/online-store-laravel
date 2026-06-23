@@ -55,25 +55,22 @@ class AdminProductController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
-        Product::validate($request);
+{
+    Product::validate($request);
 
-        $product = Product::findOrFail($id);
-        $product->setName($request->input('name'));
-        $product->setDescription($request->input('description'));
-        $product->setPrice($request->input('price'));
+    $product = Product::findOrFail($id);
+    $product->setName($request->input('name'));
+    $product->setDescription($request->input('description'));
+    $product->setPrice($request->input('price'));
 
-        if ($request->hasFile('image')) {
-            $imageName = $product->getId() . "." . $request->file('image')->extension();
-            Storage::disk('public')->put(
-                $imageName,
-                file_get_contents($request->file('image')->getRealPath())
-            );
-            $product->setImage($imageName);
-        }
-
-        $product->save();
-
-        return redirect()->route('admin.product.index');
+    if ($request->hasFile('image')) {
+        $imageName = $product->getId() . "." . $request->file('image')->extension();
+        $request->file('image')->move(public_path('img'), $imageName);
+        $product->setImage($imageName);
     }
+
+    $product->save();
+
+    return redirect()->route('admin.product.index');
+}
 }
