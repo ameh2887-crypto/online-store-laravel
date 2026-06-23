@@ -1,2 +1,5 @@
+[phases.build]
+cmds = ["composer install --no-dev --optimize-autoloader"]
+
 [start]
-cmd = "php artisan config:cache && php artisan migrate --force && php -S 0.0.0.0:$PORT -t public"
+cmd = "php -c /app/php.ini artisan config:cache && php -c /app/php.ini artisan migrate --force && php -c /app/php.ini -S 0.0.0.0:$PORT -t public"
