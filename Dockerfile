@@ -1,7 +1,6 @@
-# 1. Ganti ke versi CLI agar bisa menjalankan artisan serve dengan mulus
 FROM php:8.2-cli
 
-# 2. Install dependensi sistem
+# Install dependensi sistem
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -12,24 +11,24 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libzip-dev
 
-# 3. Install ekstensi PHP yang dibutuhkan Laravel
+# Install edkstensi PHP yang dibutuhkan Laravel
 RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# 4. Ambil Composer
+# Ambil Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# 5. Atur folder kerja
+# Atur folder kerja
 WORKDIR /app
 COPY . .
 
-# 6. Install dependensi laravel
+# Install dependensi Laravel
 RUN composer install --no-dev --optimize-autoloader
 
-# 7. Berikan hak akses folder storage
+# Berikan hak akses folder storage dan cache
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
-# 8. Biarkan Railway mendeteksi PORT secara dinamis
-EXPOSE 8080
+# Kunci port internal container ke port 80
+EXPOSE 80
 
-# 9. Perintah start yang benar menggunakan variabel $PORT tanpa kurung kurawal bermasalah
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT
+# Jalankan migrasi dan nyalakan server langsung di port 80
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=80
