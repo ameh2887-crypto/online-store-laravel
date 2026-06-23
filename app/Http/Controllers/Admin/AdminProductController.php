@@ -23,25 +23,42 @@ class AdminProductController extends Controller
         Product::validate($request);
 
         $newProduct = new Product();
+
         $newProduct->setName($request->input('name'));
         $newProduct->setDescription($request->input('description'));
         $newProduct->setPrice($request->input('price'));
-        $newProduct->setImage("game.png");
-        $newProduct->save();
 
         if ($request->hasFile('image')) {
-    $imageName = $newProduct->getId().".".$request->file('image')->extension();
-    $request->file('image')->move(public_path('img'), $imageName);
-    $newProduct->setImage($imageName);
-    $newProduct->save();
-}
+
+            $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
+
+            $request->file('image')->storeAs(
+                'products',
+                $imageName,
+                'public'
+            );
+
+            $newProduct->setImage('products/' . $imageName);
+        }
+
+        $newProduct->save();
 
         return back();
     }
 
     public function delete($id)
     {
-        Product::destroy($id);
+        $product = Product::findOrFail($id);
+
+        if (
+            $product->getImage() &&
+            Storage::disk('public')->exists($product->getImage())
+        ) {
+            Storage::disk('public')->delete($product->getImage());
+        }
+
+        $product->delete();
+
         return back();
     }
 
@@ -54,23 +71,38 @@ class AdminProductController extends Controller
         return view('admin.product.edit')->with("viewData", $viewData);
     }
 
-   public function update(Request $request, $id)
-{
-    Product::validate($request);
+    public function update(Request $request, $id)
+    {
+        Product::validate($request);
 
-    $product = Product::findOrFail($id);
-    $product->setName($request->input('name'));
-    $product->setDescription($request->input('description'));
-    $product->setPrice($request->input('price'));
+        $product = Product::findOrFail($id);
 
-    if ($request->hasFile('image')) {
-        $imageName = $product->getId() . "." . $request->file('image')->extension();
-        $request->file('image')->move(public_path('img'), $imageName);  // ← diganti
-        $product->setImage($imageName);
+        $product->setName($request->input('name'));
+        $product->setDescription($request->input('description'));
+        $product->setPrice($request->input('price'));
+
+        if ($request->hasFile('image')) {
+
+            if (
+                $product->getImage() &&
+                Storage::disk('public')->exists($product->getImage())
+            ) {
+                Storage::disk('public')->delete($product->getImage());
+            }
+
+            $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
+
+            $request->file('image')->storeAs(
+                'products',
+                $imageName,
+                'public'
+            );
+
+            $product->setImage('products/' . $imageName);
+        }
+
+        $product->save();
+
+        return redirect()->route('admin.product.index');
     }
-
-    $product->save();
-
-    return redirect()->route('admin.product.index');
-}
 }
