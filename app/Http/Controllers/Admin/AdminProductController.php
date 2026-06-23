@@ -54,7 +54,7 @@ class AdminProductController extends Controller
         return view('admin.product.edit')->with("viewData", $viewData);
     }
 
-    public function update(Request $request, $id)
+   public function update(Request $request, $id)
 {
     Product::validate($request);
 
@@ -65,7 +65,7 @@ class AdminProductController extends Controller
 
     if ($request->hasFile('image')) {
         $imageName = $product->getId() . "." . $request->file('image')->extension();
-        $request->file('image')->move(public_path('img'), $imageName);
+        $request->file('image')->move(public_path('img'), $imageName);  // ← diganti
         $product->setImage($imageName);
     }
 
