@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libzip-dev
 
-# Install edkstensi PHP yang dibutuhkan Laravel
+# Install ekstensi PHP yang dibutuhkan Laravel
 RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Ambil Composer
@@ -27,8 +27,8 @@ RUN composer install --no-dev --optimize-autoloader
 # Berikan hak akses folder storage dan cache
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
-# Kunci port internal container ke port 80
-EXPOSE 80
+# Buka port 8080 (standar deteksi otomatis Railway)
+EXPOSE 8080
 
-# Jalankan migrasi dan nyalakan server langsung di port 80
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=80
+# Jalankan migrasi dan gunakan PHP native web server ke folder public
+CMD php artisan migrate --force && php -S 0.0.0.0:8080 -t public
