@@ -1,7 +1,7 @@
-# Gunakan image PHP resmi dengan konfigurasi FPM dan versi yang sesuai
-FROM php:8.2-fpm
+# 1. Ganti ke versi CLI agar bisa menjalankan artisan serve dengan mulus
+FROM php:8.2-cli
 
-# Instal dependensi sistem dan ekstensi PHP yang dibutuhkan Laravel
+# 2. Install dependensi sistem
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -9,26 +9,27 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip
+    unzip \
+    libzip-dev
 
-# Eksekusi pemasangan driver database MySQL secara paksa di server
-RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
+# 3. Install ekstensi PHP yang dibutuhkan Laravel
+RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Ambil Composer versi terbaru
+# 4. Ambil Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Atur folder kerja di dalam container server
+# 5. Atur folder kerja
 WORKDIR /app
 COPY . .
 
-# Jalankan instalasi composer untuk vendor packagemu
+# 6. Install dependensi laravel
 RUN composer install --no-dev --optimize-autoloader
 
-# Berikan hak akses untuk folder storage Laravel
+# 7. Berikan hak akses folder storage
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
-# Port default yang dibuka oleh Railway
-EXPOSE 80
+# 8. Biarkan Railway mendeteksi PORT secara dinamis
+EXPOSE 8080
 
-# Jalankan aplikasi dan jalankan migrasi database saat start
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT:-80}
+# 9. Perintah start yang benar menggunakan variabel $PORT tanpa kurung kurawal bermasalah
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT
