@@ -1,6 +1,6 @@
-FROM php:8.2-cli
+FROM php:8.2-apache
 
-# Install dependensi sistem
+# Install dependensi sistem dan driver MySQL
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -9,26 +9,25 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     unzip \
-    libzip-dev
-
-# Install ekstensi PHP yang dibutuhkan Laravel
-RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
+    libzip-dev \
+    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Ambil Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Atur folder kerja
-WORKDIR /app
+WORKDIR /var/www/html
 COPY . .
+
+# Konfigurasi Apache agar mengarah ke folder public Laravel
+RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
+    && a2enmod rewrite
 
 # Install dependensi Laravel
 RUN composer install --no-dev --optimize-autoloader
 
 # Berikan hak akses folder storage dan cache
-RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Buka port 8080 (standar deteksi otomatis Railway)
-EXPOSE 8080
-
-# Jalankan migrasi dan gunakan PHP native web server ke folder public
-CMD php artisan migrate --force && php -S 0.0.0.0:8080 -t public
+# Jalankan migrasi, lalu biarkan Apache berjalan otomatis sebagai server utama
+CMD php artisan migrate --force && apache2-foreground
