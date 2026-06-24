@@ -31,4 +31,4 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "echo DOCKERFILE_AKTIF && sleep 600"]
+CMD ["sh", "-c", "echo PORT=$PORT && sed -i \"s/Listen 80/Listen ${PORT}/g\" /etc/apache2/ports.conf && sed -i \"s/<VirtualHost \\*:80>/<VirtualHost *:${PORT}>/g\" /etc/apache2/sites-available/000-default.conf && apache2ctl -S && apache2-foreground"]
