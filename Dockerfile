@@ -29,7 +29,6 @@ RUN composer install --no-dev --optimize-autoloader
 # Berikan hak akses folder storage dan cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Jalankan migrasi, lalu biarkan Apache berjalan otomatis sebagai server utama
 EXPOSE 8080
 
-CMD ["sh", "-c", "sed -i 's/Listen 80/Listen 8080/g' /etc/apache2/ports.conf && sed -i 's/<VirtualHost \\*:80>/<VirtualHost *:8080>/g' /etc/apache2/sites-available/000-default.conf && apache2-foreground"]
+CMD ["sh", "-c", "echo PORT=$PORT && sed -i \"s/Listen 80/Listen ${PORT}/g\" /etc/apache2/ports.conf && sed -i \"s/<VirtualHost \\*:80>/<VirtualHost *:${PORT}>/g\" /etc/apache2/sites-available/000-default.conf && apache2-foreground"]
