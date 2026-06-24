@@ -31,4 +31,4 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "echo DOCKERFILE_AKTIF && sleep 300"]
+CMD ["sh", "-c", "echo ===DOCKERFILE_BERJALAN=== && sleep 600"]
