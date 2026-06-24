@@ -1,3 +1,0 @@
-[variables]
-IS_LARAVEL = "true"
-PHP_EXTENSIONS = "pdo_mysql mbstring tokenizer xml ctype json bcmath gd fileinfo"
